@@ -23,10 +23,6 @@ You can use AKS dashboard or CLI to create Cluster
 
 #### Getting Cluster Nodes
 ````kubectl get nodes````
-
-
-
-
 ## Deploy the Application (Angular Frontend)
 
 https://docs.microsoft.com/en-us/azure/aks/learn/quick-kubernetes-deploy-cli
@@ -62,7 +58,7 @@ spec:
       # If image is not public and require authentication for pulling image    
       # Authentication is discussed below  
       imagePullSecrets:
-      - name: regcred      
+      - name: <SECRET_NAME_FROM_K8>      
 ---
 apiVersion: v1
 kind: Service
@@ -75,10 +71,6 @@ spec:
   selector:
     app: loader-design
 ````
-
-
-
-
 ## Authenticate with an Azure container registry
 There are several ways to authenticate with an Azure container registry, each of which is applicable to one or more registry usage scenarios.
 
@@ -103,9 +95,6 @@ Then, run docker login, passing 00000000-0000-0000-0000-000000000000 as the user
 ```
 docker login myregistry.azurecr.io --username 00000000-0000-0000-0000-000000000000 --password $TOKEN
 ```
-
-
-
 
 
 ## How to authenticate in K8 to pull private images
@@ -135,18 +124,18 @@ A Kubernetes cluster uses the Secret of kubernetes.io/dockerconfigjson type to a
 
 If you already ran docker login, you can copy that credential into Kubernetes:
 ```
-kubectl create secret generic regcred \
+kubectl create secret generic <SECRET_NAME_FROM_K8> \
     --from-file=.dockerconfigjson=<path/to/.docker/config.json> \
     --type=kubernetes.io/dockerconfigjson
 ```
 
 
 ### (I use this) Create a Secret by providing credentials on the command line  
-Create this Secret, naming it regcred:
+Create this Secret, naming it <SECRET_NAME_FROM_K8> :
 
 ``` ```
 ```
-kubectl create secret docker-registry regcred 
+kubectl create secret docker-registry <SECRET_NAME_FROM_K8>  
 --docker-server=<your-registry-server> 
 --docker-username=<your-name> 
 --docker-password=<your-pword> 
@@ -158,9 +147,22 @@ Combining it with docker login --expose-token
 ```
 TOKEN=$(az acr login --name <acrName> --expose-token --output tsv --query accessToken)
 
-kubectl create secret docker-registry regcred 
+kubectl create secret docker-registry <SECRET_NAME_FROM_K8>  
 --docker-server=<your-registry-server> 
 --docker-username=00000000-0000-0000-0000-000000000000
 --docker-password=$TOKEN 
 --docker-email=<your-email> 
 ```
+## Updating Secrets in Kubectl
+https://kubernetes.io/docs/tasks/configmap-secret/managing-secret-using-kubectl/
+
+We create secret from above step. If secrets are expire by timeout then you will get Image pull error
+So we have to update secret in kubectl. 
+
+### Delete the Secret you created:
+```kubectl delete secret<SECRET_NAME_FROM_K8>```
+
+Then Create again, Or other option is to edit the Secrets
+
+### Check that the Secret was created:
+```kubectl get secrets```
