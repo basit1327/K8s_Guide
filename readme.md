@@ -171,4 +171,4 @@ Then Create again, Or other option is to edit the Secrets
 
 ### Rolling Update 
 For updating image version we can use below command
-kubectl set image deployment/<DEPLOYMENT_NAME> <DEPLOYMENT_NAME>=<REGISTERY_URL>/<IMAGE_NAME>:<VERSION>
+```kubectl set image deployment/<DEPLOYMENT_NAME> <DEPLOYMENT_NAME>=<REGISTERY_URL>/<IMAGE_NAME>:<VERSION>```
